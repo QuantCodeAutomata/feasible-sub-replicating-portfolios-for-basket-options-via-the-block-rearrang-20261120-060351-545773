@@ -63,10 +63,11 @@ python -m exp.exp2_six_asset_basket --full          # paper's R = 20 restarts
 
 python -m exp.exp3_dominant_asset                  # Table 4, closed-form dominant-asset bounds
 
-python -m exp.exp4_neufeld_xiang                   # Table 5, comparison with Neufeld-Xiang (2022)
-python -m exp.exp4_neufeld_xiang --full
+python -m exp.exp4_neufeld_xiang_comparison        # Table 5, comparison with Neufeld-Xiang (2022)
+python -m exp.exp4_neufeld_xiang_comparison --full
 
-python -m exp.exp5_truncated_mixture               # Table 6, truncated-normal-mixture marginals
+python -m exp.exp5_truncated_mixture_comparison    # Table 6, truncated-normal-mixture marginals
+python -m exp.exp5_truncated_mixture_comparison --full
 ```
 
 `reproduce.sh` runs the tests and every experiment at its default (reduced)

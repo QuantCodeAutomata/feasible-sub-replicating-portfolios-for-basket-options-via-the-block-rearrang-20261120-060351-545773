@@ -1,0 +1,125 @@
+{
+  "full": false,
+  "rows": [
+    {
+      "K": 100.0,
+      "NX_eqprob_LB": 0.08715525528397908,
+      "NX_eqprob_m": 32,
+      "NX_eqspace_LB": 0.0805856973275419,
+      "NX_eqspace_m": 32,
+      "NX_reassembly_UB": 0.10223816933329619,
+      "NX_reassembly_SE": 0.0005577233452804192,
+      "n_assets": 3,
+      "this_paper_HV_ex": 0.10209,
+      "this_paper_BV_ex": 0.10213
+    },
+    {
+      "K": 105.0,
+      "NX_eqprob_LB": 0.0,
+      "NX_eqprob_m": 32,
+      "NX_eqspace_LB": 0.014596290152148519,
+      "NX_eqspace_m": 32,
+      "NX_reassembly_UB": 0.017560981964562787,
+      "NX_reassembly_SE": 0.00017098824748192784,
+      "n_assets": 3,
+      "this_paper_HV_ex": 0.01807,
+      "this_paper_BV_ex": 0.01808
+    },
+    {
+      "K": 110.0,
+      "NX_eqprob_LB": 0.0,
+      "NX_eqprob_m": 32,
+      "NX_eqspace_LB": 0.0033031643173882836,
+      "NX_eqspace_m": 32,
+      "NX_reassembly_UB": 0.00416029166527415,
+      "NX_reassembly_SE": 0.00011364862291882083,
+      "n_assets": 3,
+      "this_paper_HV_ex": 0.00404,
+      "this_paper_BV_ex": 0.00402
+    },
+    {
+      "K": 115.0,
+      "NX_eqprob_LB": 0.0,
+      "NX_eqprob_m": 32,
+      "NX_eqspace_LB": 0.0007442487502235661,
+      "NX_eqspace_m": 32,
+      "NX_reassembly_UB": 0.0010616065281382299,
+      "NX_reassembly_SE": 8.089528410262508e-05,
+      "n_assets": 3,
+      "this_paper_HV_ex": 0.00102,
+      "this_paper_BV_ex": 0.001
+    },
+    {
+      "K": 120.0,
+      "NX_eqprob_LB": 0.0,
+      "NX_eqprob_m": 32,
+      "NX_eqspace_LB": 0.00021845116951358347,
+      "NX_eqspace_m": 32,
+      "NX_reassembly_UB": 0.00030603954611395525,
+      "NX_reassembly_SE": 4.6475098599971474e-05,
+      "n_assets": 3,
+      "this_paper_HV_ex": 0.00028,
+      "this_paper_BV_ex": 0.00026
+    },
+    {
+      "K": 100.0,
+      "NX_eqprob_LB": 0.0,
+      "NX_eqprob_m": 6,
+      "NX_eqspace_LB": 0.048036928178517714,
+      "NX_eqspace_m": 6,
+      "NX_reassembly_UB": 0.34228356812791844,
+      "NX_reassembly_SE": 0.007844514947383845,
+      "n_assets": 6,
+      "this_paper_HV_ex": 0.32708,
+      "this_paper_BV_ex": 0.32733
+    },
+    {
+      "K": 110.0,
+      "NX_eqprob_LB": 0.0,
+      "NX_eqprob_m": 6,
+      "NX_eqspace_LB": 0.023132326576449237,
+      "NX_eqspace_m": 6,
+      "NX_reassembly_UB": 0.13853807299906057,
+      "NX_reassembly_SE": 0.0071634691895515155,
+      "n_assets": 6,
+      "this_paper_HV_ex": 0.14114,
+      "this_paper_BV_ex": 0.14114
+    },
+    {
+      "K": 120.0,
+      "NX_eqprob_LB": 3.43194529358602e-16,
+      "NX_eqprob_m": 6,
+      "NX_eqspace_LB": 0.02113590989517583,
+      "NX_eqspace_m": 6,
+      "NX_reassembly_UB": 0.06597667302258127,
+      "NX_reassembly_SE": 0.010632765063172234,
+      "n_assets": 6,
+      "this_paper_HV_ex": 0.06983,
+      "this_paper_BV_ex": 0.06984
+    },
+    {
+      "K": 130.0,
+      "NX_eqprob_LB": 0.0,
+      "NX_eqprob_m": 6,
+      "NX_eqspace_LB": 0.0017032394613088549,
+      "NX_eqspace_m": 6,
+      "NX_reassembly_UB": 0.03793521587626126,
+      "NX_reassembly_SE": 0.0019179510526710181,
+      "n_assets": 6,
+      "this_paper_HV_ex": 0.03757,
+      "this_paper_BV_ex": 0.03758
+    },
+    {
+      "K": 140.0,
+      "NX_eqprob_LB": 0.0,
+      "NX_eqprob_m": 6,
+      "NX_eqspace_LB": 0.0009113947181134338,
+      "NX_eqspace_m": 6,
+      "NX_reassembly_UB": 0.023900183836989174,
+      "NX_reassembly_SE": 0.006753789482951221,
+      "n_assets": 6,
+      "this_paper_HV_ex": 0.02146,
+      "this_paper_BV_ex": 0.02146
+    }
+  ]
+}

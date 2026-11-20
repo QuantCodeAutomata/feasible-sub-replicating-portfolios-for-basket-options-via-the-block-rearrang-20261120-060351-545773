@@ -78,10 +78,18 @@ def run_delta_row(
     mc_paths: int,
     mc_repeats: int,
 ) -> dict:
-    t = config.EXP5_E_SX + delta
-    kb = t + 10.0 * sum(abs(s) for s in config.EXP5_DIRECTION)
+    # Section 5.3 states E<s,X> = -1.0557 for the authors' undisclosed mixture
+    # parameters. Since the mixtures used here are a substitute (data/generate_
+    # synthetic.py; the authors' exact parameters could not be retrieved, see
+    # results/RESULTS.md), deltas are offsets from this run's *actual* E<s,X>
+    # rather than from the paper's constant, so that t = E<s,X> + delta still
+    # probes the distribution around its true centre instead of landing, by
+    # construction, deep in the money or deep out of the money.
     y_marginals = build_y_marginals(base_marginals)
     mean_sum = sum(y.mean for y in y_marginals)
+    e_sx_actual = mean_sum - 10.0 * sum(abs(s) for s in config.EXP5_DIRECTION)
+    t = e_sx_actual + delta
+    kb = t + 10.0 * sum(abs(s) for s in config.EXP5_DIRECTION)
 
     seed_salt = int(delta * 1000)
     t0 = time.time()
@@ -113,6 +121,7 @@ def run_delta_row(
         "delta": delta,
         "t": t,
         "kb": kb,
+        "e_sx_actual": round(e_sx_actual, 6),
         "this_paper_lower": round(this_paper_lower, 6),
         "this_paper_upper": round(this_paper_upper, 6),
         "nx_lower": round(nx_lower, 6),

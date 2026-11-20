@@ -11,7 +11,7 @@
       "BV_ex": 0.32733,
       "bracket_width": 0.00025059,
       "linear_fallback": false,
-      "elapsed_sec": 299.68,
+      "elapsed_sec": 139.48,
       "strikes_asset1": [
         3.3758,
         54.5369
@@ -48,7 +48,7 @@
       "BV_ex": 0.14114,
       "bracket_width": -1.8e-07,
       "linear_fallback": false,
-      "elapsed_sec": 275.83,
+      "elapsed_sec": 110.08,
       "strikes_asset1": [
         2.5151,
         68.5119
@@ -83,7 +83,7 @@
       "BV_ex": 0.06984,
       "bracket_width": 1.35e-05,
       "linear_fallback": false,
-      "elapsed_sec": 307.79,
+      "elapsed_sec": 113.51,
       "strikes_asset1": [
         2.1288,
         81.2001
@@ -118,7 +118,7 @@
       "BV_ex": 0.03758,
       "bracket_width": 6.87e-06,
       "linear_fallback": false,
-      "elapsed_sec": 330.49,
+      "elapsed_sec": 111.8,
       "strikes_asset1": [
         1.7587,
         93.0068
@@ -153,7 +153,7 @@
       "BV_ex": 0.02146,
       "bracket_width": -4.11e-06,
       "linear_fallback": false,
-      "elapsed_sec": 265.21,
+      "elapsed_sec": 111.75,
       "strikes_asset1": [
         1.5411,
         104.7042

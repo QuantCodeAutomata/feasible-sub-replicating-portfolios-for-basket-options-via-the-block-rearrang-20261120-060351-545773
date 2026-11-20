@@ -53,23 +53,34 @@ def _phi_breakpoints(marginal, y_col: np.ndarray, kb: float) -> np.ndarray:
     if candidates.size == 0:
         candidates = np.array([0.0])
     levels = (n - np.searchsorted(y_sorted, kb - candidates, side="left")) / n
+    m = candidates.size
+
+    # Vectorised precomputation: one batched call to ``cdf``/``quantile`` over
+    # all ``m`` segment levels instead of ``m`` scalar Python calls, which is
+    # what made this step slow on marginals with many atoms (``m`` can be
+    # close to ``n``). The sweep below is otherwise unchanged.
+    f_a_all = np.asarray(marginal.cdf(candidates), dtype=float).reshape(-1)
+    sign_at_a_all = (f_a_all - levels) > 1e-12
+    in_open = (levels > 0.0) & (levels < 1.0)
+    x_star_all = np.full(m, np.nan)
+    if np.any(in_open):
+        x_star_all[in_open] = np.asarray(
+            marginal.quantile(levels[in_open]), dtype=float
+        ).reshape(-1)
 
     boundaries: list[float] = []
     state_positive = False
-    m = candidates.size
+    b_next = np.append(candidates[1:], np.inf)
     for j in range(m):
         a = candidates[j]
-        b = candidates[j + 1] if j + 1 < m else np.inf
-        c = levels[j]
-        f_a = float(marginal.cdf(a))
-        sign_at_a = (f_a - c) > 1e-12
+        sign_at_a = bool(sign_at_a_all[j])
         if sign_at_a != state_positive:
             boundaries.append(float(a))
             state_positive = sign_at_a
-        if not state_positive and 0.0 < c < 1.0:
-            x_star = float(marginal.quantile(c))
-            if a < x_star < b:
-                boundaries.append(x_star)
+        if not state_positive and in_open[j]:
+            x_star = x_star_all[j]
+            if a < x_star < b_next[j]:
+                boundaries.append(float(x_star))
                 state_positive = True
     return np.asarray(boundaries[: 2 * (len(boundaries) // 2)])
 
@@ -262,21 +273,31 @@ def refine_strikes(
     return strikes_final, best_val
 
 
-def compare_with_strike_free(strikes: list[np.ndarray], hv: float, kb: float,
-                              mean_x: float, calls_at_kb: list[float]) -> tuple[list[np.ndarray], float]:
+def compare_with_strike_free(strikes: list[np.ndarray], hv: float, cash: float, kb: float,
+                              mean_x: float, calls_at_kb: list[float],
+                              n_assets: int) -> tuple[list[np.ndarray], float, float]:
     """Remark 2.10: retain the refined portfolio only if it beats both the
-    linear portfolio ``sum_i x_i - K`` (worth ``mean_X - K``) and the
-    strike-free portfolio ``sum_i (x_i - K)^+`` (worth ``sum_i C_{X_i}(K)``).
+    linear portfolio ``sum_i x_i - K`` (worth ``mean_X - K``, cash ``-K``)
+    and the strike-free portfolio ``sum_i (x_i - K)^+`` (worth
+    ``sum_i C_{X_i}(K)``, cash ``0``), each using the same basket strike
+    ``K`` on every weighted asset ``x_i`` (not ``K`` split across assets).
+
+    For nonnegative ``x_i`` and ``K > 0`` the identity
+    ``(sum_i x_i - K) - sum_i (x_i - K)^+
+        = -sum_{i not in I} x_i - (|I|-1) K <= 0`` for ``I = {i : x_i > K}``
+    shows ``sum_i (x_i - K)^+ <= (sum_i x_i - K)^+`` pointwise for every
+    nonnegative realisation, so ``sum_i (x_i - K)^+`` is always a valid
+    sub-replicator of the basket call struck at ``K``.
 
     In the ``f_i(z) = z + sum_a [(z-K^{2a})^+ - (z-K^{2a-1})^+]`` basis, the
     empty strike set gives ``f_i(z) = z`` (the linear/identity position),
-    while ``{0, K}`` gives ``f_i(z) = (z - K)^+`` (the strike-free call, since
-    ``z - max(z, 0) + max(z - K, 0) = (z - K)^+`` for ``z >= 0``).
+    while ``{0, K}`` gives ``f_i(z) = (z - K)^+`` (the strike-free call,
+    since ``z - max(z, 0) + max(z - K, 0) = (z - K)^+`` for ``z >= 0``).
     """
     linear_value = mean_x - kb
     calls_value = float(sum(calls_at_kb))
     if hv >= linear_value and hv >= calls_value:
-        return strikes, hv
+        return strikes, hv, cash
     if linear_value >= calls_value:
-        return [np.empty(0) for _ in strikes], linear_value
-    return [np.array([0.0, kb]) for _ in strikes], calls_value
+        return [np.empty(0) for _ in strikes], linear_value, -kb
+    return [np.array([0.0, kb]) for _ in strikes], calls_value, 0.0

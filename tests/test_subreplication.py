@@ -52,16 +52,46 @@ def test_sub_portfolio_basic_three_asset():
 def test_compare_with_strike_free_keeps_better_portfolio():
     strikes = [np.array([10.0, 50.0]), np.array([10.0, 50.0])]
     hv = 100.0  # deliberately very large: must dominate both fallbacks
-    strikes_out, hv_out = compare_with_strike_free(strikes, hv, kb=100.0, mean_x=100.0, calls_at_kb=[1.0, 1.0])
+    strikes_out, hv_out, cash_out = compare_with_strike_free(
+        strikes, hv, cash=-5.0, kb=100.0, mean_x=100.0, calls_at_kb=[1.0, 1.0], n_assets=2
+    )
     assert hv_out == hv
+    assert cash_out == -5.0
     assert strikes_out is strikes
 
 
 def test_compare_with_strike_free_linear_fallback_is_identity():
     # Force hv below both benchmarks: calls_value very large, linear_value also large
     strikes = [np.array([10.0, 50.0]), np.array([10.0, 50.0])]
-    strikes_out, hv_out = compare_with_strike_free(
-        strikes, hv=-1000.0, kb=100.0, mean_x=200.0, calls_at_kb=[1.0, 1.0]
+    strikes_out, hv_out, cash_out = compare_with_strike_free(
+        strikes, hv=-1000.0, cash=0.0, kb=100.0, mean_x=200.0, calls_at_kb=[1.0, 1.0], n_assets=2
     )
     assert hv_out == pytest.approx(100.0)  # mean_x - kb
+    assert cash_out == pytest.approx(-100.0)  # -kb
     assert all(s.size == 0 for s in strikes_out)
+
+
+def test_compare_with_strike_free_strike_free_fallback_uses_full_k():
+    # linear_value (mean_x - kb) below calls_value, and hv below both: the
+    # strike-free fallback sum_i (x_i - K)^+ uses the full basket strike K on
+    # every asset (Remark 2.10), not K split across assets.
+    strikes = [np.array([10.0, 50.0]), np.array([10.0, 50.0])]
+    strikes_out, hv_out, cash_out = compare_with_strike_free(
+        strikes, hv=-1000.0, cash=0.0, kb=100.0, mean_x=0.0, calls_at_kb=[10.0, 10.0], n_assets=2
+    )
+    assert hv_out == pytest.approx(20.0)  # sum of calls_at_kb
+    assert cash_out == pytest.approx(0.0)
+    for s in strikes_out:
+        assert np.allclose(s, [0.0, 100.0])
+
+
+def test_pointwise_domination_sum_calls_le_basket_call():
+    # Direct check of the inequality underlying Remark 2.10's strike-free
+    # portfolio: sum_i (x_i - K)^+ <= (sum_i x_i - K)^+ for any nonnegative
+    # realisation and any K > 0.
+    rng = np.random.default_rng(1)
+    x = rng.uniform(0.0, 200.0, size=(2000, 4))
+    kb = 50.0
+    lhs = np.maximum(x - kb, 0.0).sum(axis=1)
+    rhs = np.maximum(x.sum(axis=1) - kb, 0.0)
+    assert np.all(lhs <= rhs + 1e-12)

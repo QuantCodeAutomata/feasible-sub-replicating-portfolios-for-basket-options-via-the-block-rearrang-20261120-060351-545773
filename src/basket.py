@@ -90,14 +90,36 @@ def run_algorithm1(marginals, kb: float, n_atoms: int = config.N_ATOMS_RUN,
     asset_max = prices_r.max(axis=0)
     sp = sub_portfolio(prices_r, kb, marginals, asset_max)
 
+    row_sums = prices_r.sum(axis=1)
+    bv = float(np.mean(np.maximum(row_sums - kb, 0.0)))
+    bv_ex = reassembled_basket_value(prices_r, marginals, kb,
+                                      n_nodes=config.QUAD_NODES_REGULAR, n_nodes_kink=config.QUAD_NODES_KINK)
+    mean_x = sum(m.mean for m in marginals)
+    n_assets = len(marginals)
+    # Remark 2.10's strike-free portfolio is sum_i (x_i - K)^+, using the same
+    # basket strike K on every weighted asset x_i (see compare_with_strike_free
+    # docstring for why this dominates the linear portfolio but not the basket
+    # payoff, hence is a valid sub-replicator worth sum_i C_{X_i}(K)).
+    calls_at_kb = [m.call_price(kb) for m in marginals]
+    calls_at_kb_exact = calls_at_kb  # same exact Black-Scholes/closed-form call price
+
     if sp.linear_fallback:
-        mean_x = sum(m.mean for m in marginals)
-        calls_at_kb = [m.call_price(kb) for m in marginals]
+        # Proposition 3.1 gives the linear portfolio sum_i x_i - K as *a*
+        # valid sub-replicator when the pair decomposition fails for some
+        # asset, but Remark 2.10 requires comparing it with the strike-free
+        # portfolio sum_i w_i (S_i - K)^+ (worth sum_i C_{X_i}(K/n), always
+        # >= 0) and keeping the larger (tighter) lower bound; the upper bound
+        # (BV, BV^ex) is unaffected by which lower-bound portfolio is used and
+        # is always computed from the same reassembly formulas as the general
+        # case.
+        strikes_final, hv_final, cash_final = compare_with_strike_free(
+            sp.strikes, mean_x - kb, -kb, kb, mean_x, calls_at_kb, n_assets)
         return BasketResult(
-            kb=kb, strikes_disc=sp.strikes, cash_disc=sp.cash, hv=sp.value, bv=sp.value,
-            strikes_exact=sp.strikes, cash_exact=sp.cash, hv_exact=mean_x - kb, bv_exact=mean_x - kb,
+            kb=kb, strikes_disc=strikes_final, cash_disc=cash_final, hv=hv_final, bv=bv,
+            strikes_exact=strikes_final, cash_exact=cash_final, hv_exact=hv_final, bv_exact=bv_ex,
             linear_fallback=True,
-            diagnostics={"note": "Proposition 3.1 linear fallback: A_i empty for some asset"},
+            diagnostics={"note": "Proposition 3.1 linear fallback compared with Remark 2.10 "
+                                  "strike-free portfolios; upper bound from the usual reassembly"},
         )
 
     def mean_fn_disc(i: int, strikes_i: np.ndarray) -> float:
@@ -105,8 +127,6 @@ def run_algorithm1(marginals, kb: float, n_atoms: int = config.N_ATOMS_RUN,
 
     strikes_ref, _ = refine_strikes(sp.strikes, kb, mean_fn_disc, max_rounds=config.REFINE_MAX_ROUNDS)
     hv, cash, _ = port_value_discretised(prices_r, strikes_ref, kb)
-    row_sums = prices_r.sum(axis=1)
-    bv = float(np.mean(np.maximum(row_sums - kb, 0.0)))
 
     hv_ex, cash_ex = hv_exact(strikes_ref, kb, marginals)
     strikes_ex_ref, obj_ex = refine_strikes(strikes_ref, kb, exact_mean_fn(marginals),
@@ -117,15 +137,17 @@ def run_algorithm1(marginals, kb: float, n_atoms: int = config.N_ATOMS_RUN,
     else:
         strikes_ex_final, hv_ex_final, cash_ex_final = strikes_ref, hv_ex, cash_ex
 
-    bv_ex = reassembled_basket_value(prices_r, marginals, kb,
-                                      n_nodes=config.QUAD_NODES_REGULAR, n_nodes_kink=config.QUAD_NODES_KINK)
-
-    mean_x = sum(m.mean for m in marginals)
-    calls_at_kb = [m.call_price(kb) for m in marginals]
-    strikes_final, hv_final = compare_with_strike_free(strikes_ref, hv, kb, mean_x, calls_at_kb)
+    strikes_final, hv_final, cash_final = compare_with_strike_free(
+        strikes_ref, hv, cash, kb, mean_x, calls_at_kb, n_assets)
+    # Remark 2.10 applies equally to the exact bracket for the original
+    # marginals: the exact lower bound must also beat the linear and
+    # strike-free floors, evaluated with exact (continuous-marginal) call
+    # prices rather than the discretised ones.
+    strikes_ex_final, hv_ex_final, cash_ex_final = compare_with_strike_free(
+        strikes_ex_final, hv_ex_final, cash_ex_final, kb, mean_x, calls_at_kb_exact, n_assets)
 
     return BasketResult(
-        kb=kb, strikes_disc=strikes_final, cash_disc=cash, hv=hv_final, bv=bv,
+        kb=kb, strikes_disc=strikes_final, cash_disc=cash_final, hv=hv_final, bv=bv,
         strikes_exact=strikes_ex_final, cash_exact=cash_ex_final, hv_exact=hv_ex_final, bv_exact=bv_ex,
         linear_fallback=False,
         diagnostics={"hv_bv_gap": bv - hv_final, "hv_ex_bv_ex_gap": bv_ex - hv_ex_final},

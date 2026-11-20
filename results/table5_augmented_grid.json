@@ -1,0 +1,13 @@
+{
+  "K": 100.0,
+  "reference_HV_ex": 0.10209,
+  "coarse_m": 4,
+  "coarse_LB": 0.10204678016594752,
+  "coarse_diff_from_HV_ex": 4.321983405247698e-05,
+  "coarse_within_tolerance": false,
+  "refined_m": 16,
+  "refined_LB": 0.10204678016594758,
+  "refined_diff_from_HV_ex": 4.321983405242147e-05,
+  "refined_within_tolerance": false,
+  "coarse_vs_refined_diff": 5.551115123125783e-17
+}

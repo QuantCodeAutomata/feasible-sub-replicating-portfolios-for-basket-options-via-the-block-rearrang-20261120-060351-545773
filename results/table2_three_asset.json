@@ -25,7 +25,7 @@
       "BV_ex": 0.10213,
       "bracket_width": 3.387e-05,
       "linear_fallback": false,
-      "elapsed_sec": 225.03
+      "elapsed_sec": 65.6
     },
     {
       "K": 105.0,
@@ -48,7 +48,7 @@
       "BV_ex": 0.01808,
       "bracket_width": 1.216e-05,
       "linear_fallback": false,
-      "elapsed_sec": 212.45
+      "elapsed_sec": 56.94
     },
     {
       "K": 110.0,
@@ -71,7 +71,7 @@
       "BV_ex": 0.00402,
       "bracket_width": -1.558e-05,
       "linear_fallback": false,
-      "elapsed_sec": 211.52
+      "elapsed_sec": 55.88
     },
     {
       "K": 115.0,
@@ -94,7 +94,7 @@
       "BV_ex": 0.001,
       "bracket_width": -1.546e-05,
       "linear_fallback": false,
-      "elapsed_sec": 241.66
+      "elapsed_sec": 57.56
     },
     {
       "K": 120.0,
@@ -110,14 +110,14 @@
         0.0,
         120.0
       ],
-      "cash": -32.3669,
+      "cash": 0.0,
       "HV": 0.0,
       "BV": 0.00025,
       "HV_ex": 0.00028,
       "BV_ex": 0.00026,
       "bracket_width": -1.544e-05,
       "linear_fallback": false,
-      "elapsed_sec": 271.07
+      "elapsed_sec": 56.14
     }
   ]
 }

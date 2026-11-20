@@ -1,0 +1,53 @@
+{
+  "n_restarts": 4,
+  "nx_knots": 64,
+  "mc_paths": 20000,
+  "mc_repeats": 5,
+  "rows": [
+    {
+      "delta": 0.0,
+      "t": 3.782597433787865,
+      "kb": 17.582597433787864,
+      "e_sx_actual": 3.782597,
+      "this_paper_lower": 2.6e-05,
+      "this_paper_upper": 0.227139,
+      "nx_lower": 0.210053,
+      "nx_upper": 0.228999,
+      "nx_upper_se": 0.000929,
+      "elapsed_sec": 128.63
+    },
+    {
+      "delta": 1.0,
+      "t": 4.782597433787865,
+      "kb": 18.582597433787864,
+      "e_sx_actual": 3.782597,
+      "this_paper_lower": 1.0,
+      "this_paper_upper": 1.0,
+      "nx_lower": 1.0,
+      "nx_upper": 1.0,
+      "nx_upper_se": 0.0,
+      "elapsed_sec": 109.11
+    },
+    {
+      "delta": 2.0,
+      "t": 5.782597433787865,
+      "kb": 19.582597433787864,
+      "e_sx_actual": 3.782597,
+      "this_paper_lower": 2.0,
+      "this_paper_upper": 2.0,
+      "nx_lower": 2.0,
+      "nx_upper": 2.0,
+      "nx_upper_se": 0.0,
+      "elapsed_sec": 107.6
+    }
+  ],
+  "joint_mixability": {
+    "kb": 5.0,
+    "hv_exact": 1.989138,
+    "bv_exact": 0.0,
+    "theoretical_value": 0.0,
+    "bracket_width": -1.98913767,
+    "small_bracket": true,
+    "elapsed_sec": 182.71
+  }
+}
