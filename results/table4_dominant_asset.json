@@ -1,0 +1,62 @@
+{
+  "n_atoms": 50000,
+  "n_restarts": 4,
+  "rows": [
+    {
+      "row": "row1_uniform_uniform_lognormal",
+      "K": 70.0,
+      "crossings": 1,
+      "crossing_direction": "above",
+      "u_star": 0.1885177132318331,
+      "a1": 5.655531396954993,
+      "a2": 5.655531396954993,
+      "c": 58.68893720608984,
+      "V_mu_c": 9.724885,
+      "bound13": 9.724885,
+      "portfolio_value": 9.726834,
+      "BV": 9.723356
+    },
+    {
+      "row": "row2_single_crossing",
+      "K": 110.0,
+      "crossings": 1,
+      "crossing_direction": "above",
+      "u_star": 0.20122686717987207,
+      "a1": 31.338757584463682,
+      "a2": 31.338757584463682,
+      "c": 47.3224848310726,
+      "V_mu_c": 6.810975,
+      "bound13": 6.810975,
+      "portfolio_value": 6.811744,
+      "BV": 6.810342
+    },
+    {
+      "row": "row3_double_crossing",
+      "K": 105.0,
+      "crossings": 2,
+      "crossing_direction": "above",
+      "u_star": 0.13698831695419467,
+      "a1": 28.27137804391272,
+      "a2": 28.27137804391272,
+      "c": 48.457243912174484,
+      "V_mu_c": 1.240744,
+      "bound13": 1.223526,
+      "portfolio_value": 1.22359,
+      "BV": 1.223466
+    },
+    {
+      "row": "row4_table2_example",
+      "K": 100.0,
+      "crossings": 1,
+      "crossing_direction": "below",
+      "u_star": null,
+      "a1": null,
+      "a2": null,
+      "c": null,
+      "V_mu_c": 2.935534,
+      "bound13": null,
+      "portfolio_value": null,
+      "BV": 0.102129
+    }
+  ]
+}
