@@ -1,0 +1,131 @@
+{
+  "n_restarts": 2,
+  "n_atoms": 2000,
+  "rows": [
+    {
+      "K": 100.0,
+      "strikes_asset1": [
+        13.2031,
+        50.4628
+      ],
+      "strikes_asset2": [
+        25.6299,
+        51.63,
+        51.63,
+        52.0381,
+        52.0381,
+        100.0
+      ],
+      "strikes_asset3": [
+        23.9073,
+        62.3144,
+        64.1993,
+        69.8586,
+        81.4024,
+        100.0
+      ],
+      "cash": -62.7403,
+      "HV": 0.10088,
+      "BV": 0.10102,
+      "HV_ex": 0.102,
+      "BV_ex": 0.10145,
+      "bracket_width": -0.00055484,
+      "linear_fallback": false,
+      "elapsed_sec": 15.15
+    },
+    {
+      "K": 105.0,
+      "strikes_asset1": [
+        10.6178,
+        61.301
+      ],
+      "strikes_asset2": [
+        22.8235,
+        105.0
+      ],
+      "strikes_asset3": [
+        20.8755,
+        105.0
+      ],
+      "cash": -54.3168,
+      "HV": 0.01732,
+      "BV": 0.01742,
+      "HV_ex": 0.01805,
+      "BV_ex": 0.01757,
+      "bracket_width": -0.00047038,
+      "linear_fallback": false,
+      "elapsed_sec": 6.29
+    },
+    {
+      "K": 110.0,
+      "strikes_asset1": [
+        7.4139,
+        69.5263,
+        79.8196,
+        87.728
+      ],
+      "strikes_asset2": [
+        21.4408,
+        110.0
+      ],
+      "strikes_asset3": [
+        19.0328,
+        110.0
+      ],
+      "cash": -47.8876,
+      "HV": 0.00337,
+      "BV": 0.00337,
+      "HV_ex": 0.00404,
+      "BV_ex": 0.0036,
+      "bracket_width": -0.00043829,
+      "linear_fallback": false,
+      "elapsed_sec": 8.62
+    },
+    {
+      "K": 115.0,
+      "strikes_asset1": [
+        0.0,
+        115.0
+      ],
+      "strikes_asset2": [
+        0.0,
+        115.0
+      ],
+      "strikes_asset3": [
+        0.0,
+        115.0
+      ],
+      "cash": -46.4031,
+      "HV": 0.0,
+      "BV": 0.00015,
+      "HV_ex": 0.00102,
+      "BV_ex": 0.00102,
+      "bracket_width": -1.49e-06,
+      "linear_fallback": false,
+      "elapsed_sec": 5.67
+    },
+    {
+      "K": 120.0,
+      "strikes_asset1": [
+        0.0,
+        120.0
+      ],
+      "strikes_asset2": [
+        0.0,
+        120.0
+      ],
+      "strikes_asset3": [
+        0.0,
+        120.0
+      ],
+      "cash": -35.7619,
+      "HV": 0.0,
+      "BV": 0.0,
+      "HV_ex": 0.0,
+      "BV_ex": 0.0011,
+      "bracket_width": 0.00110228,
+      "linear_fallback": false,
+      "elapsed_sec": 5.1
+    }
+  ]
+}
