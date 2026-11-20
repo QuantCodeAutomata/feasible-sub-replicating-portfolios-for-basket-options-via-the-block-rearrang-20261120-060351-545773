@@ -4,8 +4,8 @@ Neufeld and Xiang (2022) generate, in their third numerical experiment,
 marginals that are mixtures of three to five normal distributions truncated
 to ``[-10, 10]``. The paper reproduced here cites their generator
 (https://github.com/qikunxiang/MultiMarginalOptimalTransport) but does not
-give the mixture parameters in closed form, and that repository could not be
-retrieved in this environment. This module generates representative mixtures
+give the mixture parameters in closed form, and that repository was not
+accessible for this replication. This module generates representative mixtures
 with the same structure (3-5 truncated-normal components on ``[-10, 10]``,
 mixture weights summing to one) with a fixed seed, so that the comparison of
 Experiment 5 runs on marginals of the kind described in Section 5.3 rather

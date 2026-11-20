@@ -80,7 +80,7 @@ def run_delta_row(
 ) -> dict:
     # Section 5.3 states E<s,X> = -1.0557 for the authors' undisclosed mixture
     # parameters. Since the mixtures used here are a substitute (data/generate_
-    # synthetic.py; the authors' exact parameters could not be retrieved, see
+    # synthetic.py; the authors' exact parameters were not available, see
     # results/RESULTS.md), deltas are offsets from this run's *actual* E<s,X>
     # rather than from the paper's constant, so that t = E<s,X> + delta still
     # probes the distribution around its true centre instead of landing, by
