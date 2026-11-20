@@ -100,8 +100,20 @@ def run_algorithm1(marginals, kb: float, n_atoms: int = config.N_ATOMS_RUN,
     # basket strike K on every weighted asset x_i (see compare_with_strike_free
     # docstring for why this dominates the linear portfolio but not the basket
     # payoff, hence is a valid sub-replicator worth sum_i C_{X_i}(K)).
-    calls_at_kb = [m.call_price(kb) for m in marginals]
-    calls_at_kb_exact = calls_at_kb  # same exact Black-Scholes/closed-form call price
+    # Remark 2.10's strike-free floor must live in the same world as the value
+    # it is compared against: the discretised HV is compared with the
+    # discretised empirical call E_mu_i[(X_i-K)^+], the exact HV^ex with the
+    # closed-form call C_{X_i}(K); using the exact call for both would let the
+    # exact floor leak into the discretised result and break the HV = BV
+    # certificate of Corollary 2.6 on the discretised marginals.
+    calls_at_kb_disc = [float(np.mean(np.maximum(prices_r[:, i] - kb, 0.0))) for i in range(n_assets)]
+    calls_at_kb_exact = [m.call_price(kb) for m in marginals]
+    # Remark 2.10's strike-free floor sum_i (x_i - K)^+ pointwise dominates the
+    # linear portfolio only when every asset is nonnegative (see
+    # compare_with_strike_free); Table 6 (Section 5.3) uses real-valued
+    # truncated-normal-mixture marginals that can be negative, so the floor
+    # must be disabled there.
+    nonneg = all(float(m.quantile(0.0)) >= -1e-9 for m in marginals)
 
     if sp.linear_fallback:
         # Proposition 3.1 gives the linear portfolio sum_i x_i - K as *a*
@@ -113,7 +125,7 @@ def run_algorithm1(marginals, kb: float, n_atoms: int = config.N_ATOMS_RUN,
         # is always computed from the same reassembly formulas as the general
         # case.
         strikes_final, hv_final, cash_final = compare_with_strike_free(
-            sp.strikes, mean_x - kb, -kb, kb, mean_x, calls_at_kb, n_assets)
+            sp.strikes, mean_x - kb, -kb, kb, mean_x, calls_at_kb_exact, n_assets, nonneg=nonneg)
         return BasketResult(
             kb=kb, strikes_disc=strikes_final, cash_disc=cash_final, hv=hv_final, bv=bv,
             strikes_exact=strikes_final, cash_exact=cash_final, hv_exact=hv_final, bv_exact=bv_ex,
@@ -138,13 +150,13 @@ def run_algorithm1(marginals, kb: float, n_atoms: int = config.N_ATOMS_RUN,
         strikes_ex_final, hv_ex_final, cash_ex_final = strikes_ref, hv_ex, cash_ex
 
     strikes_final, hv_final, cash_final = compare_with_strike_free(
-        strikes_ref, hv, cash, kb, mean_x, calls_at_kb, n_assets)
+        strikes_ref, hv, cash, kb, mean_x, calls_at_kb_disc, n_assets, nonneg=nonneg)
     # Remark 2.10 applies equally to the exact bracket for the original
     # marginals: the exact lower bound must also beat the linear and
     # strike-free floors, evaluated with exact (continuous-marginal) call
     # prices rather than the discretised ones.
     strikes_ex_final, hv_ex_final, cash_ex_final = compare_with_strike_free(
-        strikes_ex_final, hv_ex_final, cash_ex_final, kb, mean_x, calls_at_kb_exact, n_assets)
+        strikes_ex_final, hv_ex_final, cash_ex_final, kb, mean_x, calls_at_kb_exact, n_assets, nonneg=nonneg)
 
     return BasketResult(
         kb=kb, strikes_disc=strikes_final, cash_disc=cash_final, hv=hv_final, bv=bv,

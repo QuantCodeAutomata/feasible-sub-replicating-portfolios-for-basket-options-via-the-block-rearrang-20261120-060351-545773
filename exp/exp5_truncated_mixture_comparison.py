@@ -136,7 +136,13 @@ def run_joint_mixability_check(n_restarts: int) -> dict:
     claims these marginals are jointly mixable to numerical accuracy, i.e.
     ``hv_exact`` and ``bv_exact`` should agree closely with each other and
     with the strike-free theoretical value ``max(sum_i E[m_i] - kb, 0)``."""
-    marginals = generate_marginals(6, config.EXP5_SEED + config.EXP5_JOINT_SEED_OFFSET)
+    # Section 5.3: "with six of these marginals and unit weights" refers to six
+    # copies of one fixed marginal, not six independently drawn ones. n i.i.d.
+    # copies of the same law are jointly mixable (Gaffke and Rueschendorf,
+    # 1981), which is the degeneracy the paper reports; six different random
+    # marginals need not be. Reuse the first marginal of the 3-marginal set.
+    one_marginal = generate_marginals(1, config.EXP5_SEED + config.EXP5_JOINT_SEED_OFFSET)[0]
+    marginals = [one_marginal] * 6
     kb = 5.0
     t0 = time.time()
     res = run_algorithm1(

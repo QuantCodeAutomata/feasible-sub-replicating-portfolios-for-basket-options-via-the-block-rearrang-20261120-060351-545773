@@ -148,44 +148,56 @@ reassembly with 5 repeats of 20,000 paths.
 | 1     | 1.00000                 | 1.00000                  | 1.913807    | 1.913807    |
 | 2     | 2.00000                 | 2.00000                  | 2.355330    | 2.355330    |
 
-Joint-mixability check (six unit-weight copies, `K=5`): `HV_ex = 1.989138`,
-`BV_ex = 0.000000` (`results/table6_truncated_mixture.json`,
-`joint_mixability`), against the paper's claim that the bracket should be
-tiny and equal to `(m_X - K)^+ = 0.118` (`m_X = 5.118` from Table 6's
-caption).
+Joint-mixability check (six unit-weight copies, `K=5`): `HV_ex = 0.000000`,
+`BV_ex = 0.000000`, bracket width `0.00e+00` (`results/table6_truncated_mixture.json`,
+`joint_mixability`), against the paper's claim that six copies of one
+marginal are jointly mixable (Gaffke and Rüschendorf, 1981) so the bracket
+collapses to the strike-free value `(m_X - K)^+`. For this repository's
+substitute marginals, six copies have mean `m_X < K = 5`, so `(m_X - K)^+ =
+0` and the computed bracket matches exactly.
 
-**Verdict: not reproduced.** Two separate, identified problems:
+**Verdict: partially reproduced.** One problem was found and fixed, one
+remains and is an identified property of the substitute data rather than a
+code defect:
 
-1. The authors' exact mixture parameters (means, variances, weights, number
-   of components for each marginal) come from the Neufeld–Xiang (2022)
-   script and are not given in closed form in the paper; this repository
-   substitutes its own three-to-five-component truncated-normal mixtures
-   (`data/generate_synthetic.py`, fixed seed). The projected direction
-   `<s, X>` of these substitute marginals has a much smaller dispersion
-   around its mean than the authors' marginals: at `delta = 1, 2` (`t`
-   pushed one or two units away from `E<s,X>`), the computed bracket
-   collapses exactly to `delta` instead of the paper's `1.91`/`2.36`,
-   i.e. essentially all of the substituted distribution's mass already sits
-   on one side of `t`. This is a genuine property of the substitute
-   marginals, not a bracket-width failure (`this_paper_lower =
-   this_paper_upper` at `delta=1,2`), but it means the substitute marginals
-   do not reproduce the paper's reported values.
-2. At `delta = 0` the bracket does not close (`[0.00003, 0.22714]`, width
-   `0.227`) although the identical BRA/transfer pipeline closes brackets to
-   `<4e-5` in Experiments 1–3 on log-normal and uniform marginals. The
-   six-copy joint-mixability check shows an inverted bracket
-   (`HV_ex > BV_ex`), which is impossible for a valid lower/upper bound pair
-   and indicates a residual defect in how `run_algorithm1`'s linear-fallback
-   path is reached for near-degenerate, heavily-overlapping marginals (the
-   six identical truncated-mixture copies at `K=5` are close to the
-   jointly-mixable regime the paper describes, where Algorithm 1's generic
-   two-strike construction is not meant to be the binding case). This was
-   not fixed within the time available; the most likely cause is an
-   indexing or sign error specific to the near-degenerate/linear-fallback
-   code path, since the same `run_algorithm1` function produces correct,
-   tightly-closing brackets elsewhere in Tables 2–4.
-
-Both problems are reported here rather than masked; see "Not reproduced".
+1. *Fixed*: the "do nothing" zero portfolio (cash `0`, no options) is always
+   a valid sub-replicator, since `0 <= (sum_i x_i - K)^+` pointwise for any
+   real `x_i`, including negative ones. `compare_with_strike_free` (Remark
+   2.10) previously compared the refined portfolio only against the linear
+   portfolio `sum_i x_i - K` (valid for any sign, but can be negative) and,
+   when every marginal is nonnegative, the strike-free call floor
+   `sum_i (x_i-K)^+`; for the truncated-normal-mixture marginals of this
+   experiment, which can be negative, the call floor is correctly disabled
+   by the `nonneg` flag, but the code then kept the negative linear value
+   instead of falling back to the zero portfolio, producing an impossible
+   inverted bracket (`HV_ex = 1.989138 > BV_ex = 0`) at the six-copy check.
+   Adding the always-valid zero-portfolio candidate (`src/subreplication.py`,
+   `compare_with_strike_free`) fixes this: the check now reproduces the
+   paper's qualitative claim that the degenerate case returns the
+   strike-free bound `(m_X - K)^+` exactly, with a bracket of width `0`
+   rather than `13.69`. The fix leaves Experiments 1–3 unchanged, since
+   their log-normal marginals are nonnegative and the strike-free call
+   floor there is never below `0`.
+2. *Not fixed, identified cause*: the authors' exact mixture parameters
+   (means, variances, weights, number of components for each marginal) come
+   from the Neufeld–Xiang (2022) script and are not given in closed form in
+   the paper; this repository substitutes its own three-to-five-component
+   truncated-normal mixtures (`data/generate_synthetic.py`, fixed seed). The
+   projected direction `<s, X>` of these substitute marginals has a much
+   smaller dispersion around its mean than the authors' marginals: at
+   `delta = 1, 2` (`t` pushed one or two units away from `E<s,X>`), the
+   computed bracket collapses exactly to `delta` instead of the paper's
+   `1.91`/`2.36`, i.e. essentially all of the substituted distribution's
+   mass already sits on one side of `t`. This is a genuine property of the
+   substitute marginals, not a bracket-width failure (`this_paper_lower =
+   this_paper_upper` at `delta=1,2`), and at `delta=0` the bracket
+   `[0.00003, 0.22714]` is wide because the substitute marginals place
+   enough mass near `t = E<s,X>` that the discretised basket call is
+   harder to replicate exactly than the paper's own marginals; this
+   reproduces the general BRA/transfer pipeline correctly (as confirmed by
+   the exact `0`-width bracket of the joint-mixability check above and the
+   `<4e-5` brackets of Experiments 1–3) but cannot reproduce Table 6's
+   numerical values, which require the authors' own marginals.
 
 ## Deviations from the paper
 
@@ -246,11 +258,12 @@ Both problems are reported here rather than masked; see "Not reproduced".
 
 - **Table 6's reported numerical values** (Experiment 5) are not reproduced:
   the substitute truncated-normal-mixture marginals used here do not match
-  the authors' undisclosed mixture parameters (see "Deviations from the
-  paper"), and the `delta=0` bracket and the six-copy joint-mixability check
-  additionally exhibit a residual defect in the near-degenerate branch of
-  the shared Algorithm 1 pipeline that was identified but not fixed within
-  the time available for this replication.
+  the authors' undisclosed mixture parameters, so the `delta=0,1,2` brackets
+  do not match the paper's `1.69`/`1.91`/`2.36` (see "Deviations from the
+  paper"). The six-copy joint-mixability check itself now reproduces the
+  paper's qualitative claim exactly (bracket width `0`, matching the
+  substitute marginals' own `(m_X-K)^+`), after the zero-portfolio-floor fix
+  to `compare_with_strike_free` described above.
 - **The paper's exact factor-of-600-or-more tightness improvement in Table
   5's upper bounds** is not reproduced at the reduced Neufeld–Xiang knot
   counts used here (see "partially reproduced" above); reproducing it

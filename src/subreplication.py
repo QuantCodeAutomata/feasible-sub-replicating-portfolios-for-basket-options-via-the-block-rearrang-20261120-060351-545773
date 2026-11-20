@@ -275,7 +275,7 @@ def refine_strikes(
 
 def compare_with_strike_free(strikes: list[np.ndarray], hv: float, cash: float, kb: float,
                               mean_x: float, calls_at_kb: list[float],
-                              n_assets: int) -> tuple[list[np.ndarray], float, float]:
+                              n_assets: int, nonneg: bool = True) -> tuple[list[np.ndarray], float, float]:
     """Remark 2.10: retain the refined portfolio only if it beats both the
     linear portfolio ``sum_i x_i - K`` (worth ``mean_X - K``, cash ``-K``)
     and the strike-free portfolio ``sum_i (x_i - K)^+`` (worth
@@ -287,7 +287,13 @@ def compare_with_strike_free(strikes: list[np.ndarray], hv: float, cash: float, 
         = -sum_{i not in I} x_i - (|I|-1) K <= 0`` for ``I = {i : x_i > K}``
     shows ``sum_i (x_i - K)^+ <= (sum_i x_i - K)^+`` pointwise for every
     nonnegative realisation, so ``sum_i (x_i - K)^+`` is always a valid
-    sub-replicator of the basket call struck at ``K``.
+    sub-replicator of the basket call struck at ``K``. The identity requires
+    ``x_i >= 0``: with a single asset at ``K-eps`` below zero and all others
+    at ``-10``, ``sum_i (x_i-K)^+`` can exceed ``(sum_i x_i - K)^+`` once some
+    ``x_i`` are negative, so this floor is applied only when every marginal's
+    support is nonnegative (``nonneg=True``); the linear portfolio, whose
+    value is always a lower bound of ``(sum_i x_i - K)^+`` for any real
+    ``x_i`` (``z - K <= (z - K)^+`` trivially), is compared unconditionally.
 
     In the ``f_i(z) = z + sum_a [(z-K^{2a})^+ - (z-K^{2a-1})^+]`` basis, the
     empty strike set gives ``f_i(z) = z`` (the linear/identity position),
@@ -295,9 +301,20 @@ def compare_with_strike_free(strikes: list[np.ndarray], hv: float, cash: float, 
     since ``z - max(z, 0) + max(z - K, 0) = (z - K)^+`` for ``z >= 0``).
     """
     linear_value = mean_x - kb
-    calls_value = float(sum(calls_at_kb))
-    if hv >= linear_value and hv >= calls_value:
+    calls_value = float(sum(calls_at_kb)) if nonneg else -np.inf
+    # The "do nothing" zero portfolio (cash 0, no options) is always a valid
+    # sub-replicator, since 0 <= (sum_i x_i - K)^+ pointwise for any real
+    # x_i. It is the degenerate case of Remark 2.10 used in the jointly
+    # mixable example of Section 5.3, where the reported lower bound is
+    # (m_X - K)^+ = max(linear_value, 0): when the linear portfolio's value
+    # is negative, the zero portfolio dominates it regardless of the sign of
+    # the marginals (unlike the strike-free call floor, which needs nonneg).
+    zero_value = 0.0
+    best_value = max(linear_value, calls_value, zero_value)
+    if hv >= best_value:
         return strikes, hv, cash
-    if linear_value >= calls_value:
+    if best_value == zero_value:
+        return [np.empty(0) for _ in strikes], zero_value, 0.0
+    if best_value == linear_value:
         return [np.empty(0) for _ in strikes], linear_value, -kb
     return [np.array([0.0, kb]) for _ in strikes], calls_value, 0.0
